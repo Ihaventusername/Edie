@@ -6,20 +6,25 @@ CFLAGS = -Wall -Wextra -pedantic
 SRC = main.c
 
 # Normal build (default target)
-default: edie
+default: ei
 
-edie: $(SRC)
+ei: $(SRC)
 	$(CC) $(CFLAGS) -o $@ $^
 
 # Slim build
 slim: $(SRC)
-	$(CC) -Os -o $@ $^
+	$(CC) -Os -o ei $^
 
 # Static build
 static: $(SRC)
-	$(CC) $(CFLAGS) -Os -static -o $@ $^
+	$(CC) $(CFLAGS) -Os -static -o ei $^
+
+# Install build
+.PHONY: install
+install: ei
+	install -m 7777 ei /usr/bin/
 
 # Clean up
 .PHONY: clean
 clean:
-	 rm -f edie slim static
+	 rm -f ei slim static
