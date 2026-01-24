@@ -23,9 +23,9 @@ static: $(SRC)
 # Install build
 .PHONY: install
 install: ei
-	install -m 777 ei /usr/bin/
+	install -m 0755 ei /usr/bin/
 
 # Clean up
 .PHONY: clean
 clean:
-	 rm -f ei slim static
+	 rm -f ei
