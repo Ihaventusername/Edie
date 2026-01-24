@@ -42,6 +42,7 @@ make install
  * Insert Mode: ^^data^^ (Pushes existing data forward)
  * Overwrite Mode: %%data%% (Replaces data at the current pointer)
  * Hex Mode: Start the program with -H to input data as hex pairs (e.g., %%FF00AA%%)
+             or use ` to temporarily switch mode
 4. Macro Loops
  * Syntax: |count instructions|
  * Example: |10 >| (Move 10 steps right)
