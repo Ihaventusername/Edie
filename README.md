@@ -31,7 +31,6 @@ gcc -Os -s -static-libgcc -fno-stack-protector -fno-unwind-tables -fno-asynchron
  * Move Left: <
  * Jump to Start: )
  * Jump to End: (
- * Inspect: P (Shows a hex dump of the bytes around the current pointer)
 3. Editing Data
  * Insert Mode: ^^data^^ (Pushes existing data forward)
  * Overwrite Mode: %%data%% (Replaces data at the current pointer)
