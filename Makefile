@@ -13,9 +13,8 @@ ei: $(SRC)
 
 # Slim build
 slim: $(SRC)
-	echo 'you may need a gcc for slim build!'
-	
-gcc -Os -s -static-libgcc -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wl,--gc-sections -Wl,-z,norelro edie.c -o ei
+	echo 'you need gcc to slim build!'
+	gcc -Os -s -fno-stack-protector -fno-ident     -ffunction-sections -fdata-sections     -Wl,--gc-sections     -Wl,-z,norelro -Wl,--build-id=none     edie.c -o ei
 
 # Static build
 static: $(SRC)
