@@ -17,7 +17,7 @@
 extern int system(const char *command);
 
 /* Configuration */
-#define MAX_BUF 65536
+#define MAX_BUF 65535
 #define MAX_PATH 256
 #define LOOP_BUF 256
 
@@ -168,7 +168,7 @@ void parse(Edie *e, char *cmd) {
 
         if (c == ':' || c == '_') { i++; continue; }
 
-        if (c == '^' && cmd[i+1] == 'V') {
+        if (c == 22) {
             enter_visual_mode(e);
             i += 2;
             continue;
@@ -246,7 +246,15 @@ void parse(Edie *e, char *cmd) {
                 }
             }
         }
-        
+        /* HEX */
+
+else if (c == '`') {
+    e->is_hex = !e->is_hex; /* 0 -> 1 or 1 -> 0 */
+    printf(e->is_hex ? "\n[MODE: HEX]\n" : "\n[MODE: TEXT]\n");
+    i++;
+}
+
+
         /* Save File */
         else if (c == '=') {
             i++;
@@ -270,7 +278,7 @@ void parse(Edie *e, char *cmd) {
                 if (f) {
                     fwrite(e->data, 1, e->size, f);
                     fclose(f);
-                    printf("Saved %d bytes\n", e->size);
+                    printf("S %dB\n", e->size);
                 }
                 if (cmd[i] == '}') i++;
             }
@@ -297,7 +305,7 @@ int main(int argc, char **argv) {
 
     char cmd[1024];
     while (1) {
-        printf(e.is_hex ? "hex_mode> " : "edie> ");
+        printf(e.is_hex ? "_ " : ":");
         
         if (!fgets(cmd, sizeof(cmd), stdin)) break;
         
@@ -331,9 +339,9 @@ int main(int argc, char **argv) {
                 if (f) {
                     e.size = (int)fread(e.data, 1, MAX_BUF, f);
                     fclose(f);
-                    printf("Opened %d bytes\n", e.size);
+                    printf("L %dB\n", e.size);
                 } else {
-                    printf("New file: %s\n", e.path);
+                    printf("N %s\n", e.path);
                 }
             }
         } else {
