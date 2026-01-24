@@ -50,4 +50,4 @@ make install
  * Enter/Exit: Press Ctrl+V (or type ^V in the command line)
  * Navigation: Use < and > to move the cursor while viewing data.
  * Quick Edit: Start typing any command (like %%new%%) while in Visual Mode. The command will appear in the brackets; press ENTER to execute it immediately without leaving the view.
- * Exit View: Press Esc
+ * Exit View: Press Ctrl+V
