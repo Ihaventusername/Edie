@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -pedantic
 
 # Source files
-SRC = main.c
+SRC = edie.c
 
 # Normal build (default target)
 default: ei
