@@ -4,20 +4,27 @@
 
 Build
 
-## 1. clone
+## 1. Clone
 ``` bash
 git clone https://github.com/Ihaventusername/Edie.git
 cd ./Edie
 ```
-## 2. build
-#### if you want more stable:
+## 2. Build
+#### Normal build:
 ``` bash
-gcc edie.c -Os -o ei
+make
 ```
-#### if you want more slim(about 8.3KB):
+#### Slim build (around 8.3KB):
 ```bash
-# the command is for aarch64/x86_64
-gcc -Os -s -static-libgcc -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wl,--gc-sections -Wl,-z,norelro edie.c -o ei
+make slim
+```
+#### Static build:
+```bash
+make static
+```
+#### Install:
+``` bash
+make install
 ```
 
 ## HOW TO USE
