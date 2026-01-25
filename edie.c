@@ -222,30 +222,44 @@ void parse(Edie *e, char *cmd) {
         else if (c == '(') { e->ptr = e->size; i++; }
 
         /* |n...| Loop container */
-        else if (c == '|') {
-            i++;
-            char *p_num = &cmd[i];
-            int n = s_atoi(&p_num);
-            i = (int)(p_num - cmd);
+        /* |n...| Loop container fixed */
+else if (c == '|') {
+    i++;
+    char *p_num = &cmd[i];
+    int n = s_atoi(&p_num); 
+    i = (int)(p_num - cmd); 
+    
+    int start_idx = i;
+    int depth = 1;
+    
+    while (cmd[i] && depth > 0) {
+        if (cmd[i] == '|') {
+            depth--;
+            if (depth == 0) break; 
+        } else if (cmd[i] == ' ' && depth == 1) {
+            //Nothing :(
+        }
+        i++;
+    }
+    
+    if (depth == 0) {
+        int len = i - start_idx; 
+        if (len > 0 && n > 0) {
+            char sub_cmd[LOOP_BUF];
+            if (len >= LOOP_BUF) len = LOOP_BUF - 1; 
             
-            int start_idx = i;
-            int depth = 1;
-            while (cmd[i] && depth > 0) {
-                if (cmd[i] == '|') depth--; 
-                else i++;
-            }
-            
-            if (depth == 0) {
-                int len = (i - start_idx) - 1;
-                if (len > 0 && len < LOOP_BUF && n > 0) {
-                    char sub_cmd[LOOP_BUF];
-                    int k;
-                    for(k=0; k<len; k++) sub_cmd[k] = cmd[start_idx + k];
-                    sub_cmd[k] = 0;
-                    while (n--) parse(e, sub_cmd);
-                }
+            for(int k=0; k<len; k++) sub_cmd[k] = cmd[start_idx + k];
+            sub_cmd[len] = 0;
+
+            while (n--) {
+                parse(e, sub_cmd); 
             }
         }
+        i++; 
+        continue; 
+    }
+}
+
         /* HEX */
 
 else if (c == '`') {
