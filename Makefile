@@ -1,31 +1,46 @@
-# Compiler and flags
-CC = gcc
-CFLAGS = -Wall -Wextra -pedantic
+# =========================
+#   EDIE Makefile (glibc/musl)
+# =========================
 
-# Source files
-SRC = edie.c
+# Build mode: glibc (default) or musl
+MODE ?= glibc
 
-# Normal build (default target)
-default: ei
+# Compiler selection
+ifeq ($(MODE),musl)
+    CC := musl-gcc
+else
+    CC := gcc
+endif
 
-ei: $(SRC)
-	$(CC) $(CFLAGS) -o $@ $^
+# Common flags
+CFLAGS  := -Wall -Wextra -pedantic
+SRC     := edie.c
+BIN     := ei
 
-# Slim build
-slim: $(SRC)
-	echo 'you need gcc to slim build!'
-	gcc -Os -s -fno-stack-protector -fno-ident     -ffunction-sections -fdata-sections     -Wl,--gc-sections     -Wl,-z,norelro -Wl,--build-id=none     edie.c -o ei
+# Default build
+default: $(BIN)
+
+$(BIN): $(SRC)
+	$(CC) $(CFLAGS) -O2 -o $@ $^
+
+# Slim build (small dynamic binary)
+slim:
+	$(CC) -Os -s \
+		-fno-stack-protector -fno-ident \
+		-ffunction-sections -fdata-sections \
+		-Wl,--gc-sections -Wl,-z,norelro -Wl,--build-id=none \
+		$(SRC) -o $(BIN)
 
 # Static build
-static: $(SRC)
-	$(CC) $(CFLAGS) -Os -static -o ei $^
+static:
+	$(CC) $(CFLAGS) -Os -static $(SRC) -o $(BIN)
 
-# Install build
+# Install
 .PHONY: install
-install: ei
-	install -m 0755 ei /usr/bin/
+install: $(BIN)
+	install -m 0755 $(BIN) /usr/bin/
 
-# Clean up
+# Clean
 .PHONY: clean
 clean:
-	 rm -f ei
+	rm -f $(BIN)
