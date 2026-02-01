@@ -44,3 +44,19 @@ install: $(BIN)
 .PHONY: clean
 clean:
 	rm -f $(BIN)
+
+.PHONY: compress
+# Compressed build (strip + optional UPX)
+compress: $(BIN)
+	@echo "[*] Stripping binary..."
+	@strip $(BIN) || true
+
+	@if command -v upx >/dev/null 2>&1; then \
+		echo "[*] UPX found, compressing..."; \
+		upx --best --lzma $(BIN); \
+	else \
+		echo "[*] UPX not found, skipping compression."; \
+	fi
+
+	@echo "[*] Final size:"
+	@ls -lh $(BIN)
