@@ -261,9 +261,61 @@ void parse(Edie *e, char *cmd) {
       i++;
       continue;
     }
+    /* |>DT!!:BODY|  —— 数据驱动循环 */
+if (c == '|' && cmd[i + 1] == '>') {
+    i += 2;
 
+    int dt_start = i, dt_len = 0;
+    int body_start = -1, body_len = 0;
+    int end_pos = -1;
+
+    /* 找 DT 和 BODY */
+    while (cmd[i]) {
+        if (cmd[i] == '!' && cmd[i+1] == '!' && cmd[i+2] == ':') {
+            dt_len = i - dt_start;
+            body_start = i + 3;
+            i += 3;
+            break;
+        }
+        i++;
+    }
+
+    if (body_start == -1) continue;
+
+    while (cmd[i]) {
+        if (cmd[i] == '|') {
+            end_pos = i;
+            break;
+        }
+        i++;
+    }
+
+    if (end_pos == -1) continue;
+
+    body_len = end_pos - body_start;
+    if (body_len >= LOOP_BUF) body_len = LOOP_BUF - 1;
+
+    char dt[LOOP_BUF], body[LOOP_BUF];
+    for (int k = 0; k < dt_len; k++) dt[k] = cmd[dt_start + k];
+    dt[dt_len] = 0;
+
+    for (int k = 0; k < body_len; k++) body[k] = cmd[body_start + k];
+    body[body_len] = 0;
+
+    /* while-loop */
+    while (1) {
+        if (dt_len > 0 &&
+            (e->ptr + dt_len <= e->size) &&
+            s_cmp(&e->data[e->ptr], dt, dt_len) == 0) {
+            parse(e, body);
+        } else break;
+    }
+
+    i = end_pos + 1;
+    continue;
+}
     /* |n...| Loop container (支持嵌套) */
-    if (c == '|') {
+    else if (c == '|') {
       i++;
       char *p_num = &cmd[i];
       int n = s_atoi(&p_num);
@@ -424,6 +476,55 @@ void parse(Edie *e, char *cmd) {
       i++;
       continue;
     }
+
+if (c == '&' && cmd[i + 1] == '&') {
+    i += 2;
+
+    int name_start = i;
+    while (cmd[i] && ((cmd[i] >= 'A' && cmd[i] <= 'Z') ||
+                      (cmd[i] >= 'a' && cmd[i] <= 'z') ||
+                      (cmd[i] >= '0' && cmd[i] <= '9') ||
+                      cmd[i] == '_')) {
+        i++;
+    }
+    int name_len = i - name_start;
+
+    /* 从头扫描命令串寻找 "NAME */
+    int scan = 0;
+    while (cmd[scan]) {
+        if (cmd[scan] == '"') {
+            int p = scan + 1;
+            int k = 0;
+            while (k < name_len &&
+                   cmd[p] == cmd[name_start + k]) {
+                p++; k++;
+            }
+            if (k == name_len &&
+                !((cmd[p] >= 'A' && cmd[p] <= 'Z') ||
+                  (cmd[p] >= 'a' && cmd[p] <= 'z') ||
+                  (cmd[p] >= '0' && cmd[p] <= '9') ||
+                  cmd[p] == '_')) {
+                /* 找到标签，跳转 */
+                i = p;
+                break;
+            }
+        }
+        scan++;
+    }
+    continue;
+}
+if (c == '"') {
+    i++;
+    int name_start = i;
+    while (cmd[i] && ((cmd[i] >= 'A' && cmd[i] <= 'Z') ||
+                      (cmd[i] >= 'a' && cmd[i] <= 'z') ||
+                      (cmd[i] >= '0' && cmd[i] <= '9') ||
+                      cmd[i] == '_')) {
+        i++;
+    }
+    /* 标签定义不需要动作，只是被 goto 搜索 */
+    continue;
+}
 
     /* 默认：跳过未知字符 */
     i++;
