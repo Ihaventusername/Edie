@@ -46,14 +46,13 @@ clean:
 	rm -f $(BIN)
 
 .PHONY: compress
-# Compressed build (strip + optional UPX)
 compress: $(BIN)
 	@echo "[*] Stripping binary..."
 	@strip $(BIN) || true
 
 	@if command -v upx >/dev/null 2>&1; then \
 		echo "[*] UPX found, compressing..."; \
-		upx --best --lzma $(BIN); \
+		upx --best --lzma $(BIN) || echo "[*] UPX: not compressible, skipping."; \
 	else \
 		echo "[*] UPX not found, skipping compression."; \
 	fi
